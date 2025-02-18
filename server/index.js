@@ -4,10 +4,13 @@ const {
   client,
   createTables,
   createUser,
-  createSkill,
   createProduct,
-  fetchProducts
-} = require('./db'); = require('./db');
+  fetchUsers,
+  fetchProducts,
+  fetchFavorites,
+  createFavorite,
+  destroyFavorite,
+} = require('./db');
 const app = express ();
 
 // middleware 
@@ -20,14 +23,16 @@ app. use(express.json())
   console.log("Connected to Database")
   await createTables();
   console.log ("Tables created");
+
+  // creating the  users and products 
   const [Ariel, Cinderella,Pocahontas , singing, dancing, juggling, plateSpinning] = await Promise.all([
-    createUser({ username: 'Ariel', password: 'scs0234#' }),
-    createUser({ username: 'Cinderella', password: 'ts3gh4!!' }),
-    createUser({ username: 'Pocahontas', password: 'z!8459 ' }),
-    createProduct({ name: 'Macbook'}),
-    createProduct({ name: 'Ipad'}),
-    createProduct({ name: 'Meta Glasses'}),
-    createProduct({ name: 'Airphones Max'}),
+    createUser( 'Ariel', 'scs0234#' ),
+    createUser( 'Cinderella', 'ts3gh4!!' ),
+    createUser(  'Pocahontas', 'z!8459 ' ),
+    createProduct( 'Macbook'),
+    createProduct( 'Ipad'),
+    createProduct( 'Meta Glasses'),
+    createProduct( 'Airphones Max'),
   ]);
   // Fetch and log users and products
   const users = await fetchUsers();
@@ -44,7 +49,7 @@ app. use(express.json())
 
 app.get('/api/users',async(req,res,next)=> {
 try{
-    const users = await fetchUser();
+    const users = await fetchUsers();
     res.send(users);
 }catch(error){
 next(error);
