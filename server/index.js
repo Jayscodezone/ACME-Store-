@@ -90,7 +90,7 @@ app.delete('/api/users/:userId/favorites/:id', async (req, res, next) => {
 });
 
 
-// Error Handeling 
+// Error Handling
 app.use((err, req, res, next) => {
   console.error(error);
   res.status(500).send('Something went wrong!');

@@ -52,7 +52,7 @@ const createProduct = async(name)=>{
 }
 
 // createFavorite: A method that creates a favorite in the database and then returns the created record,
-const createFavorite = async()=>{({ userId, productId }) => {
+const createFavorite = async({ userId, productId }) => {
     const SQL = `
       INSERT INTO favorites(id, user_id, product_id) VALUES($1, $2, $3) RETURNING *
     `;
@@ -60,10 +60,9 @@ const createFavorite = async()=>{({ userId, productId }) => {
     return response.rows[0];
   };
 
-}
-
 // fetchUsers: A method that returns an array of users in the database.
-const fetchUsers = async()=>{const SQL = `SELECT * FROM users`;
+const fetchUsers = async()=>
+  {const SQL = `SELECT * FROM users`;
     const response = await client.query(SQL);
     return response.rows;
   };
