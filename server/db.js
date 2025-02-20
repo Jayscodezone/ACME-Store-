@@ -63,17 +63,15 @@ const createProduct = async(name)=>{
 
 // createFavorite: A method that creates a favorite in the database and then returns the created record,
 const createFavorite = async({ userId, productId }) => {
-  try {
+
     const SQL = `
       INSERT INTO favorites(id, user_id, product_id) 
       VALUES($1, $2, $3) 
       RETURNING *`;
     const response = await client.query(SQL, [uuid.v4(), userId, productId]);
     return response.rows[0];
-  } catch (error) {
-    console.error("Error creating favorite: ", error);
-  }
-};
+  };
+
 // fetchUsers: A method that returns an array of users in the database.
 const fetchUsers = async()=>{
   try {
@@ -81,7 +79,8 @@ const fetchUsers = async()=>{
     const response = await client.query(SQL);
     return response.rows;
   } catch (error) {
-    console.error("Error fetching users: ", error);
+    console.error("Error fetching users ");
+    throw error; 
   }
 };
   
@@ -127,26 +126,34 @@ const destroyFavorite = async({ userId, favoriteId })=>{
       console.log("Initializing DB layer...");
       await client.connect();
       await createTables();
-      await createUser("Ariel", "password");
-      await createUser("Cinderella", "password");
-      await createUser("Pocahontas", "password");
-      await createUser("SnowWhite", "password");
+
+      // Create Users 
+      const ariel = await createUser("Ariel", "password");
+      const cinderella = await createUser("Cinderella", "password");
+      const pocahontas = await createUser("Pocahontas", "password");
+      const snowWhite = await createUser("SnowWhite", "password");
       console.table(await fetchUsers());
-       // Create products
-      const Macbook = await createProduct("Macbook");
-    const MetaGlasses = await createProduct("Meta Glasses");
-    const AirphonesMax = await createProduct("Airphones Max ");
-    const Ipad =  await createProduct("Ipad ");
-   // Create favorites
- // Create favorites
- await createFavorite({ userId: Ariel.id, productId: Macbook.id });
- await createFavorite({ userId: Cinderella.id, productId: MetaGlasses.id });
- await createFavorite({ userId: Pocahontas.id, productId:Ipad.id });
- await createFavorite({ userId: SnowWhite.id, productId:AirphonesMax.id });
-    } catch (error) {
-      console.error("Error during DB initialization");
-    }
-  };
+
+      //Create Products 
+      const macbook = await createProduct("Macbook");
+      const metaGlasses = await createProduct("Meta Glasses");
+      const airphonesMax = await createProduct("Airphones Max");
+      const ipad = await createProduct("iPad");
+      console.table(await fetchProducts());
+
+// Create Favorites using the stored user and product IDs
+await createFavorite({ userId: ariel.id, productId: macbook.id });
+await createFavorite({ userId: cinderella.id, productId: metaGlasses.id });
+await createFavorite({ userId: pocahontas.id, productId: ipad.id });
+await createFavorite({ userId: snowWhite.id, productId: airphonesMax.id });
+
+console.table(await fetchFavorites(ariel.id));
+} catch (error) {
+console.error("Error during DB initialization", error);
+}
+};
+
+
 // start the database
 init();
 

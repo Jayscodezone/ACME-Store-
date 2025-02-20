@@ -21,39 +21,23 @@ app.use(express.json());
 // Initalize the database 
 const init = async () => {
 try {
-  // await client.connect(); // Connect to the database once
+  // await client.connect(); 
   console.log("Connected to Database");
 
   await createTables(); // Create tables
   console.log("Tables created");
 
-  // creating the  users and products 
-  // const [Ariel, Cinderella, Pocahontas, Macbook, Ipad, MetaGlasses, AirphonesMax] = await Promise.all([
-  //   createUser('Ariel', 'scs0234#'),
-  //   createUser('Cinderella', 'ts3gh4!!'),
-  //   createUser('Pocahontas', 'z!8459'),
-  //   createProduct('Macbook'),
-  //   createProduct('Ipad'),
-  //   createProduct('Meta Glasses'),
-  //   createProduct('Airphones Max'),
-  // ]);
-  
   // Fetch and log users and products
   const users = await fetchUsers();
   console.log(users);
 
   const products = await fetchProducts();
   console.log(products);
-  console.log(products);
 } catch (error) {
   console.error("Error during DB initialization:", error);
 }
 };
-  // Log specific IDs for testing
-  // console.log(Ariel.id);
-  // console.log(Macbook.id)
- 
- 
+  
  // routes for users 
 
 app.get('/api/users',async(req,res,next)=> {
@@ -87,12 +71,24 @@ app.get('/api/users/:id/favorites', async (req, res, next) => {
 
 app.post('/api/users/:id/favorites', async (req, res, next) => {
   try {
-    const favorite = await createFavorite({ userId: req.params.id, productId: req.body.product_id });
-    res.status(201).send(favorite);
-  } catch (error) {
-    next(error);
-  }
-});
+    const { id:user_id} = req.params;
+    const { product_id} = req.body;
+   const favorites = await createFavorite({ 
+        userId:user_id,
+        productId: product_id,
+        })
+console.log (favorites);
+        console.log("Received request body:", req.body); // Debugging
+        console.log("Type of req.body:", typeof req.body);
+        console.log("Extracted product_id:", product_id); // Debugging
+     // Return the created favorite with status 201
+     res.status(201).json(favorites);
+    } catch (error) {
+      console.error("Error creating favorite:", error);
+      next(error);
+    }
+  });
+  
 
 app.delete('/api/users/:userId/favorites/:id', async (req, res, next) => {
   try {
@@ -107,10 +103,13 @@ app.delete('/api/users/:userId/favorites/:id', async (req, res, next) => {
 // Error Handling
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).send('Something went wrong!');
+  res.status(500).json(`Something went wrong: ${err}!`);
 });
 
 // Port for sever 
 app.listen(3000, () => {
   console.log('Listening on port 3000');
 });
+
+//  init function
+init();
